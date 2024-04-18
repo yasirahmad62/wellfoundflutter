@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "556706045177",
+    "project_id": "wellfoundapplicatio",
+    "storage_bucket": "wellfoundapplicatio.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:556706045177:android:3f4c3de9d480215334d628",
+        "android_client_info": {
+          "package_name": "com.example.wellfoundapplicaiton"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmIXuBmsHlUc4jpWuzjga5LHIByP_ZYJE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
