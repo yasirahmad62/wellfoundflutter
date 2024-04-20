@@ -1,8 +1,9 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:wellfoundapplicaiton/JobListing.dart';
 import 'package:wellfoundapplicaiton/post.dart';
+import 'candidatepage.dart';
 
 class FeedsPage extends StatefulWidget {
   const FeedsPage({Key? key}) : super(key: key);
@@ -29,7 +30,7 @@ class _FeedsPageState extends State<FeedsPage> {
         .reference()
         .child("users")
         .child(_user.uid);
-    print(_user.uid);
+
     userRef.child('connections').onValue.listen((event) {
       // Use event.snapshot to access the DataSnapshot
       DataSnapshot snapshot = event.snapshot;
@@ -55,7 +56,6 @@ class _FeedsPageState extends State<FeedsPage> {
       print('Error fetching connected user IDs: $error');
     });
   }
-
 
   Future<void> _fetchConnectedUsersPosts() async {
     List<Post> posts = [];
@@ -93,16 +93,63 @@ class _FeedsPageState extends State<FeedsPage> {
       _loading = false;
     });
   }
-
   @override
+  String getTimeDifference(int timestamp) {
+    if (timestamp == null) return '';
+
+    final postTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    final now = DateTime.now();
+    final difference = now.difference(postTime);
+
+    if (difference.inHours < 24) {
+      return '${difference.inHours}h ago';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays}d ago';
+    } else {
+      return '7+';
+    }
+  }
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Feeds'),
+        title: Text(
+          'Feeds',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.black,
+        bottom: PreferredSize(
+          child: Container(
+            color: Color(0xFFd94242),
+            height: 2.0,
+          ),
+          preferredSize: Size.fromHeight(2.0),
+        ),
+        leading: Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: Image.network(
+            'https://firebasestorage.googleapis.com/v0/b/wellfoundapplicatio.appspot.com/o/app_logo.jpeg?alt=media&token=a4f478a0-47ac-4bd1-af36-22aa216f82b3',
+            width: 40,
+            height: 40,
+          ),
+        ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(_user.email ?? ''),
+          InkWell(
+            onTap: () {
+              // Navigate to user profile page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => JobListingPage()),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Jobs',
+                style: TextStyle(color: Colors.white), // Set text color to white
+              ),
+            ),
           ),
         ],
       ),
@@ -110,28 +157,83 @@ class _FeedsPageState extends State<FeedsPage> {
           ? Center(child: CircularProgressIndicator())
           : _posts.isEmpty
           ? Center(child: Text('No posts yet'))
-          :ListView.builder(
-        itemCount: _posts.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(_posts[index].title),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Author: ${_posts[index].author}'),
-                Text('Company: ${_posts[index].company}'),
-                Text('Description: ${_posts[index].description}'),
-                Text('Location: ${_posts[index].location}'),
-                Text('Salary: ${_posts[index].salary}'),
-                Text('Timestamp: ${DateTime.fromMillisecondsSinceEpoch(_posts[index].timestamp)}'),
-              ],
+          : SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: [
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: _posts.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Posted by ${_posts[index].author}',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            '${_posts[index].title} at ${_posts[index].company}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            _posts[index].description,
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          SizedBox(height: 8),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child:Row(
+                                children: [
+                                  Chip(label: Text(_posts[index].location)),
+                                  SizedBox(width: 8),
+                                  Chip(label: Text(_posts[index].salary)),
+                                  SizedBox(width: 8),
+                                  Chip(label: Text(getTimeDifference(_posts[index].timestamp))),
+                                ],
+                              ),
+
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-            onTap: () {
-              // Handle feed item tap
-            },
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CandidatePage()),
           );
         },
+        child: Icon(Icons.add),
       ),
+      backgroundColor: Colors.white, // Background color of the scaffold
     );
   }
+
 }

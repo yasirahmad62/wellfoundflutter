@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'signup.dart'; // Import the SignUpPage
+
+import 'package:wellfoundapplicaiton/login.dart';
+
+
 void main() async {
   // Initialize Firebase before running the app
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,11 +17,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Well found',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SignUpPage(), // Set the SignUpPage as the home page
+      home: LoginPage(),
     );
   }
 }
